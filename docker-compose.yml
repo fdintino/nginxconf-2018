@@ -1,0 +1,114 @@
+version: '2.3'
+
+services:
+  jenkins:
+    build:
+      context: docker/containers/jenkins
+      args:
+        - BUILD_DATE=${BUILD_DATE:- }
+        - VCS_REV=${VCS_REV:- }
+        - VERSION=${VERSION:- }
+    image: theatlantic/nginxconf-2018-demo-jenkins
+    environment:
+      JAVA_OPTS: "-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"
+    privileged: true
+    ports:
+      - "50001:50001"
+    expose:
+      - "8080"
+      - "50001"
+    volumes:
+      - jenkins-home:/var/jenkins_home
+      - ./config/init.groovy.d:/usr/share/jenkins/ref/init.groovy.d
+      - ./www/repo:/www/repo:cached
+    tty: true
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RECURSION_LIMIT=10000
+      - TERM=xterm-256color
+      - JENKINS_SLAVE_AGENT_PORT=50001
+      - GITHUB_TOKEN=${GITHUB_TOKEN:- }
+
+  web:
+    environment:
+      - CELERY_BROKER_URL=amqp://olympia:olympia@rabbitmq/olympia
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DATABASES_DEFAULT_URL=mysql://root:@mysqld/olympia
+      - ELASTICSEARCH_LOCATION=elasticsearch:9200
+      - MEMCACHE_LOCATION=memcached:11211
+      - MYSQL_DATABASE=olympia
+      - MYSQL_ROOT_PASSWORD=docker
+      - OLYMPIA_SITE_URL=http://olympia.test
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - RECURSION_LIMIT=10000
+      - TERM=xterm-256color
+    build:
+      context: ./docker/containers/web
+      args:
+        - BUILD_DATE=${BUILD_DATE:- }
+        - VCS_REV=${VCS_REV:- }
+        - VERSION=${VERSION:- }
+    image: theatlantic/nginxconf-2018-demo-web
+    privileged: true
+    ports:
+      - "8001:8001"
+      - "19321:19321/udp"
+    expose:
+      - "22"
+    volumes:
+      - ./www/logs:/www/logs:cached
+      - www-builds:/www/builds
+      - ./www/repo:/www/repo:cached
+      - ./config/nginx/conf.d:/etc/nginx/conf.d
+      - ./config/nginx/includes:/etc/nginx/includes
+      - ./config/nginx/vhosts:/etc/nginx/vhosts
+      - ./config/supervisord.d:/etc/supervisord.d
+
+  memcached:
+    image: memcached:1.4
+
+  mysqld:
+    image: mysql:5.7
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=olympia
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.4.1
+    environment:
+      # Disable all xpack related features to avoid unrelated logging
+      # in docker logs. https://github.com/mozilla/addons-server/issues/8887
+      # This also avoids us to require authentication for local development
+      # which simplifies the setup.
+      - xpack.security.enabled=false
+      - xpack.monitoring.enabled=false
+      - xpack.graph.enabled=false
+      - xpack.watcher.enabled=false
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    mem_limit: 2g
+
+  redis:
+    image: redis:2.8
+
+  rabbitmq:
+    image: rabbitmq:3.6-management
+    hostname: olympia
+    expose:
+      - "5672"
+      - "15671"
+      - "15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=olympia
+      - RABBITMQ_DEFAULT_PASS=olympia
+      - RABBITMQ_DEFAULT_VHOST=olympia
+
+  autograph:
+    image: mozilla/autograph:2.3.0
+
+volumes:
+  www-builds:
+    driver: local
+  jenkins-home:
+    driver: local

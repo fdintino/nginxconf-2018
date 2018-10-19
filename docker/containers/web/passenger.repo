@@ -1,0 +1,6 @@
+[passenger]
+name=passenger
+baseurl=https://oss-binaries.phusionpassenger.com/yum/passenger/el/$releasever/$basearch
+enabled=1
+gpgcheck=0
+cost=1500

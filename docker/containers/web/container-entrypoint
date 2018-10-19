@@ -1,0 +1,26 @@
+#!/bin/bash
+set -exo pipefail
+
+# empty out stderr/stdout logs
+cp /dev/null /var/log/uwsgi/stdout.log
+cp /dev/null /var/log/uwsgi/stderr.log
+
+if [ $(id --user) -eq 0 ]; then
+    mkdir -p /var/lib/nginx/cache
+    chown -R deploy:deploy /var/lib/nginx
+    chown -R deploy:deploy /www
+    chown -R deploy:deploy /var/log/uwsgi
+    [ -e /etc/ssh/ssh_host_rsa_key ] || ssh-keygen -A
+else
+    sudo mkdir -p /var/lib/nginx/cache
+    sudo chown -R deploy:deploy /var/lib/nginx
+    sudo chown -R deploy:deploy /www
+    sudo chown -R deploy:deploy /var/log/uwsgi
+    [ -e /etc/ssh/ssh_host_rsa_key ] || sudo ssh-keygen -A
+fi
+
+if [ $(id --user) -eq 0 ]; then
+    exec su root -c 'exec "$@"' sh -- "$@"
+else
+    exec "$@"
+fi
