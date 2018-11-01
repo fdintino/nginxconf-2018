@@ -1,6 +1,6 @@
 # Using NGiNX for release automation at The Atlantic
 
-This repository contains an example environment that implements the techniques described in the 2018 NGINXConf talk **Using NGINX for release automation at The Atlantic** (a video link will be added when it becomes available).
+This repository contains an example environment that implements the techniques described in the 2018 NGINXConf talk [Using NGINX for release automation at The Atlantic](https://www.youtube.com/watch?v=ax5qhChhNpE) ([slides](https://www.slideshare.net/fdintino/using-nginx-for-release-automation-at-the-atlantic)).
 
 ## Environment setup
 
