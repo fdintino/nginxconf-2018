@@ -20,7 +20,7 @@ services:
     volumes:
       - jenkins-home:/var/jenkins_home
       - ./config/init.groovy.d:/usr/share/jenkins/ref/init.groovy.d
-      - ./www/repo:/www/repo:cached
+      - ./www/repos:/www/repos:cached
     tty: true
     environment:
       - PYTHONUNBUFFERED=1
@@ -59,7 +59,7 @@ services:
     volumes:
       - ./www/logs:/www/logs:cached
       - www-builds:/www/builds
-      - ./www/repo:/www/repo:cached
+      - ./www/repos:/www/repos:cached
       - ./config/nginx/conf.d:/etc/nginx/conf.d
       - ./config/nginx/includes:/etc/nginx/includes
       - ./config/nginx/vhosts:/etc/nginx/vhosts

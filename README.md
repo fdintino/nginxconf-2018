@@ -4,7 +4,7 @@ This repository contains an example environment that implements the techniques d
 
 ## Environment setup
 
-1. Run `git clone --recursive git@github.com:theatlantic/nginxconf-2018.git`
+1. Run `git clone git@github.com:theatlantic/nginxconf-2018.git`
 
 2. Enable wildcard DNS for *.nginxdemo by adding the DNS server 127.0.0.1:19321,
    or add to your /etc/hosts file:

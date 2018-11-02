@@ -27,7 +27,7 @@ def createBranchSource(remote) {
 }
 
 def projectName = "addons-server"
-def remote = '/www/repo/.git'
+def remote = '/www/repos/addons-server.git'
 
 def jenkins = Jenkins.getInstance()
 

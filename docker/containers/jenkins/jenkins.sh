@@ -1,6 +1,13 @@
 #! /bin/bash -e
 set -exo pipefail
 
+
+if [ ! -e /www/repos/addons-server.git ]; then
+    echo "--- Performing initial clone of addons-server git repo"
+    git clone --bare https://github.com/theatlantic/nginxconf-2018-mozilla-addons-server.git \
+        /www/repos/addons-server.git
+fi
+
 touch "${COPY_REFERENCE_FILE_LOG}" || \
     { echo "Can not write to ${COPY_REFERENCE_FILE_LOG}. Wrong volume permissions?"; exit 1; }
 

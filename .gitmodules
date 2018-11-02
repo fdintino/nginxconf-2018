@@ -1,3 +1,0 @@
-[submodule "www/repo"]
-	path = www/repo
-	url = https://github.com/theatlantic/nginxconf-2018-mozilla-addons-server.git
